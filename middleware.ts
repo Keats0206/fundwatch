@@ -31,10 +31,7 @@ export function middleware(request: NextRequest) {
 
   const fundId = request.cookies.get(getCookieName())?.value ?? null;
   if (!fundId || !validateFundId(fundId)) {
-    // Landing page: unauthenticated users visiting / see the demo first
-    if (pathname === "/") {
-      return NextResponse.redirect(new URL("/demo", request.url));
-    }
+    // Redirect unauthenticated users to login
     console.log("[FundWatch auth] No valid fund cookie, redirecting to /login", { pathname, hasCookie: !!fundId, validFund: fundId ? validateFundId(fundId) : false });
     const login = new URL("/login", request.url);
     login.searchParams.set("from", pathname);
