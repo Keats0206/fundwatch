@@ -95,7 +95,7 @@ For alpha release to Mantis Ventures contacts:
 
 1. **Deploy to Vercel** — Connect repo, add env vars (see Phase 1 of [docs/ALPHA_INVITE.md](docs/ALPHA_INVITE.md)).
 2. **Supabase** — Run all migrations, insert Mantis fund, seed Mantis companies.
-3. **FUND_CREDENTIALS** — Add `[{"fundId":"mantis-ventures","username":"mantisventures","password":"YOUR_PASSWORD"}]` to Vercel env.
+3. **FUND_CREDENTIALS** — Add `[{"fundId":"mantis-ventures","username":"mantisventures","password":"YOUR_PASSWORD"}]` to Vercel env (both Production and Preview).
 4. **Invite doc** — Share [docs/ALPHA_INVITE.md](docs/ALPHA_INVITE.md) with contacts (include password securely).
 
 See [docs/ALPHA_INVITE.md](docs/ALPHA_INVITE.md) for the full alpha invite and demo script.

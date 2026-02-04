@@ -41,8 +41,12 @@ export async function POST(request: NextRequest) {
   }
 
   const cookieName = getCookieName();
-  // Always use secure in production (Vercel is always HTTPS)
-  const isSecure = process.env.NODE_ENV === "production" || request.nextUrl.protocol === "https:";
+  // Use secure when served over HTTPS (Vercel/proxies use X-Forwarded-Proto)
+  const forwardedProto = request.headers.get("x-forwarded-proto");
+  const isSecure =
+    forwardedProto === "https" ||
+    process.env.NODE_ENV === "production" ||
+    request.nextUrl.protocol === "https:";
   
   // Create response with cookie
   const res = NextResponse.json({
