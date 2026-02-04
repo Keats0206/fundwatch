@@ -30,7 +30,7 @@ export function CompanyCard({ company }: { company: Company }) {
         : "Repeated negative or high-severity signals.");
 
   return (
-    <Link href={`/company/${company.id}`} className="block focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg group">
+    <Link href={`/company/${company.id}`} prefetch={false} className="block focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg group">
       <Card className="h-full transition-colors hover:bg-muted/50 border-border/80 rounded-lg">
         <CardHeader className="pb-2 flex flex-row items-start justify-between gap-2">
           <div className="min-w-0">

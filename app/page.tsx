@@ -163,6 +163,7 @@ export default function PortfolioDashboard() {
                 <li key={company.id}>
                   <Link
                     href={`/company/${company.id}`}
+                    prefetch={false}
                     className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 hover:underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md py-1 group"
                   >
                     <span className="font-medium text-foreground">{company.name}</span>

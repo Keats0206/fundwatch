@@ -65,6 +65,7 @@ export default function AlertsPage() {
                       <div className="flex items-center gap-2 flex-wrap">
                         <Link
                           href={`/company/${alert.companyId}`}
+                          prefetch={false}
                           className="font-medium text-foreground hover:underline"
                         >
                           {company?.name ?? "Unknown company"}
@@ -79,6 +80,7 @@ export default function AlertsPage() {
                     </div>
                     <Link
                       href={`/company/${alert.companyId}`}
+                      prefetch={false}
                       className="text-sm font-medium text-accent-highlight hover:underline shrink-0"
                     >
                       View company →

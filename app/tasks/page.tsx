@@ -183,6 +183,7 @@ export default function TasksPage() {
                           <div className="flex items-center gap-2 mt-2 flex-wrap">
                             <Link
                               href={`/company/${task.companyId}`}
+                              prefetch={false}
                               className="text-xs font-medium text-foreground hover:text-accent-highlight hover:underline"
                             >
                               {task.company.name} →

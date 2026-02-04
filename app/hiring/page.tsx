@@ -145,6 +145,7 @@ export default function HiringRadarPage() {
                       <div className="flex items-center gap-2 flex-wrap">
                         <Link
                           href={`/company/${r.companyId}`}
+                          prefetch={false}
                           className="font-medium text-foreground hover:text-accent-highlight hover:underline transition-colors"
                         >
                           {r.company.name}
