@@ -74,16 +74,18 @@ function Sidebar() {
       <SidebarNav />
       {lockedToFund && (
         <div className="mt-auto px-2 py-4 border-t border-sidebar-border">
-          <Link
-            href="/api/logout"
-            className={cn(
-              "flex items-center gap-2.5 rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
-              "text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-            )}
-          >
-            <LogOut className="h-4 w-4 shrink-0" />
-            Sign out
-          </Link>
+          <form action="/api/logout" method="get" className="w-full">
+            <button
+              type="submit"
+              className={cn(
+                "flex items-center gap-2.5 rounded-md px-3 py-2.5 text-sm font-medium transition-colors w-full text-left",
+                "text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              )}
+            >
+              <LogOut className="h-4 w-4 shrink-0" />
+              Sign out
+            </button>
+          </form>
         </div>
       )}
     </aside>
