@@ -5,7 +5,7 @@ import { AppShell } from "@/components/app-shell";
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  if (pathname === "/login" || pathname === "/demo") {
+  if (pathname === "/login") {
     return <>{children}</>;
   }
   return <AppShell>{children}</AppShell>;

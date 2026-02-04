@@ -1,15 +1,23 @@
 "use client";
 
 import { createContext, useContext, useState, useMemo, useEffect, type ReactNode } from "react";
-import { getCookieName } from "./auth";
 import { useFunds, useFundById } from "./hooks/use-data";
 import type { Fund } from "./types";
 
-function getFundIdFromCookie(): string | null {
-  if (typeof document === "undefined") return null;
-  const name = getCookieName();
-  const match = document.cookie.match(new RegExp(`${name}=([^;]+)`));
-  return match?.[1]?.trim() ?? null;
+// Since we use httpOnly cookies, we can't read them client-side
+// The fund ID will be determined server-side via middleware
+// For client-side, we'll fetch it from an API endpoint if needed
+async function getFundIdFromServer(): Promise<string | null> {
+  try {
+    const res = await fetch("/api/auth/me");
+    if (res.ok) {
+      const data = await res.json();
+      return data.fundId ?? null;
+    }
+  } catch {
+    // Ignore errors
+  }
+  return null;
 }
 
 type FundContextValue = {
@@ -30,13 +38,16 @@ export function FundProvider({ children }: { children: ReactNode }) {
   const { data: fund } = useFundById(fundId);
 
   useEffect(() => {
-    const fromCookie = getFundIdFromCookie();
-    if (fromCookie) {
-      setFundId(fromCookie);
-      setLockedToFund(true);
-      return;
-    }
-    if (funds?.length && !fundId) setFundId(funds[0].id);
+    // Check if user is authenticated (has valid cookie)
+    getFundIdFromServer().then((fromServer) => {
+      if (fromServer) {
+        setFundId(fromServer);
+        setLockedToFund(true);
+        return;
+      }
+      // If no auth, use first available fund (for dev/demo mode)
+      if (funds?.length && !fundId) setFundId(funds[0].id);
+    });
   }, [funds, fundId]);
 
   const value: FundContextValue = useMemo(

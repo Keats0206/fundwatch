@@ -40,28 +40,23 @@ export async function POST(request: NextRequest) {
     console.warn("[FundWatch login] Could not fetch fund name (using fundId as name):", msg);
   }
 
-  console.log("[FundWatch login] Success:", { fundId, fundName });
   const cookieName = getCookieName();
+  const isSecure = request.nextUrl.protocol === "https:";
   
-  // Set cookie with proper configuration for persistence
-  const isProduction = process.env.NODE_ENV === "production";
-  const isSecure = request.nextUrl.protocol === "https:" || isProduction;
-  
+  // Create response with cookie
   const res = NextResponse.json({
     fundId,
     fundName,
   });
   
-  // Set cookie on response - must be set before returning
+  // Set cookie - using httpOnly for security, but we have /api/auth/me for client access
   res.cookies.set(cookieName, fundId, {
     path: "/",
     maxAge: 60 * 60 * 24 * 30, // 30 days
     sameSite: "lax",
     secure: isSecure,
-    httpOnly: false, // Allow client-side JavaScript access
+    httpOnly: true, // Secure - prevents XSS, client reads via /api/auth/me
   });
-  
-  console.log("[FundWatch login] Cookie set:", { cookieName, fundId, secure: isSecure });
   
   return res;
 }
