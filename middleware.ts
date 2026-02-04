@@ -29,10 +29,20 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const fundId = request.cookies.get(getCookieName())?.value ?? null;
-  if (!fundId || !validateFundId(fundId)) {
+  const cookieName = getCookieName();
+  const fundId = request.cookies.get(cookieName)?.value ?? null;
+  const isValid = fundId ? validateFundId(fundId) : false;
+  
+  if (!fundId || !isValid) {
     // Redirect unauthenticated users to login
-    console.log("[FundWatch auth] No valid fund cookie, redirecting to /login", { pathname, hasCookie: !!fundId, validFund: fundId ? validateFundId(fundId) : false });
+    console.log("[FundWatch auth] No valid fund cookie, redirecting to /login", { 
+      pathname, 
+      cookieName,
+      hasCookie: !!fundId, 
+      cookieValue: fundId,
+      validFund: isValid,
+      allCookies: Array.from(request.cookies.getAll().map(c => c.name))
+    });
     const login = new URL("/login", request.url);
     login.searchParams.set("from", pathname);
     return NextResponse.redirect(login);

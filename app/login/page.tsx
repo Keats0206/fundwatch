@@ -32,9 +32,9 @@ export default function LoginPage() {
         setError(data.error ?? "Login failed");
         return;
       }
-      console.log("[FundWatch login] Redirecting to", from);
-      router.push(from);
-      router.refresh();
+      console.log("[FundWatch login] Login successful, redirecting to", from);
+      // Use window.location for full page reload to ensure cookie is set
+      window.location.href = from;
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       console.error("[FundWatch login] Request error:", msg);
