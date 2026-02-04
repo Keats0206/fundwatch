@@ -41,7 +41,8 @@ export async function POST(request: NextRequest) {
   }
 
   const cookieName = getCookieName();
-  const isSecure = request.nextUrl.protocol === "https:";
+  // Always use secure in production (Vercel is always HTTPS)
+  const isSecure = process.env.NODE_ENV === "production" || request.nextUrl.protocol === "https:";
   
   // Create response with cookie
   const res = NextResponse.json({
@@ -49,13 +50,13 @@ export async function POST(request: NextRequest) {
     fundName,
   });
   
-  // Set cookie - using httpOnly for security, but we have /api/auth/me for client access
+  // Set cookie with proper settings for persistence
   res.cookies.set(cookieName, fundId, {
     path: "/",
     maxAge: 60 * 60 * 24 * 30, // 30 days
     sameSite: "lax",
-    secure: isSecure,
-    httpOnly: true, // Secure - prevents XSS, client reads via /api/auth/me
+    secure: isSecure, // Always true in production
+    httpOnly: true, // Secure - prevents XSS
   });
   
   return res;

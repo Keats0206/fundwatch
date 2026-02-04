@@ -36,10 +36,22 @@ export function middleware(request: NextRequest) {
 
   // Check authentication
   const cookieName = getCookieName();
-  const fundId = request.cookies.get(cookieName)?.value ?? null;
+  const cookie = request.cookies.get(cookieName);
+  const fundId = cookie?.value ?? null;
   const isValid = fundId ? validateFundId(fundId) : false;
   
   if (!fundId || !isValid) {
+    // Debug logging in production to diagnose issues
+    if (process.env.NODE_ENV === "production") {
+      console.log("[FundWatch auth] Auth check failed", {
+        pathname,
+        cookieName,
+        hasCookie: !!cookie,
+        cookieValue: fundId ? `${fundId.substring(0, 10)}...` : null,
+        isValid,
+        cookieCount: request.cookies.getAll().length,
+      });
+    }
     // Redirect to login with return path
     const login = new URL("/login", request.url);
     login.searchParams.set("from", pathname);
