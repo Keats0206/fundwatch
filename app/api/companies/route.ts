@@ -2,19 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 /**
- * System-wide default signals that get automatically created for each new company
+ * Signal texts are shared via standard signals (company_id = null) in the DB.
+ * getSignalTexts() returns standard + custom for each company, so we do NOT
+ * create company-specific copies when adding a company — that would duplicate
+ * the standard signals (e.g. "Funding" appears twice).
  */
-const SYSTEM_WIDE_SIGNALS = [
-  { text: "Funding rounds or capital raises", format: "text" as const },
-  { text: "Key executive hires or departures", format: "text" as const },
-  { text: "Significant hiring increases or pauses", format: "text" as const },
-  { text: "Product launches or major feature announcements", format: "text" as const },
-  { text: "Partnership announcements or customer wins", format: "text" as const },
-  { text: "Leadership or organizational changes", format: "text" as const },
-  { text: "Negative press or controversy", format: "text" as const },
-  { text: "Website or branding changes", format: "text" as const },
-];
-
 type HealthStatus = "green" | "yellow" | "red";
 
 function generateCompanyId(): string {
@@ -110,33 +102,7 @@ export async function POST(request: NextRequest) {
     console.log("[FundWatch companies] Insert successful:", data);
     console.log("[FundWatch companies] Created company:", { id, name: name.trim(), fundId });
 
-    // Create system-wide default signals for this company
-    try {
-      const now = new Date().toISOString();
-      const signalInserts = SYSTEM_WIDE_SIGNALS.map((signal, index) => ({
-        id: `st-${id}-${index}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-        company_id: id,
-        text: signal.text,
-        format: signal.format,
-        type: "custom" as const,
-        created_at: now,
-        updated_at: now,
-      }));
-
-      const { error: signalsError } = await supabase
-        .from("signal_texts")
-        .insert(signalInserts);
-
-      if (signalsError) {
-        console.error("[FundWatch companies] Failed to create system signals:", signalsError);
-        // Don't fail the company creation if signals fail
-      } else {
-        console.log(`[FundWatch companies] Created ${signalInserts.length} system-wide signals for ${name.trim()}`);
-      }
-    } catch (err) {
-      console.error("[FundWatch companies] Error creating system signals:", err);
-      // Don't fail the company creation if signals fail
-    }
+    // Signal texts come from standard signals (company_id = null) — no per-company copies
 
     return NextResponse.json({
       id,

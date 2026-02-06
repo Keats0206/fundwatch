@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -102,6 +103,14 @@ export default function LoginPage() {
               {loading ? "Signing in…" : "Sign in"}
             </Button>
           </form>
+          <div className="mt-4 pt-4 border-t border-border/60">
+            <Link
+              href="/demo"
+              className="block text-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              View demo portfolio →
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>

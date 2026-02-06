@@ -254,6 +254,12 @@ export async function getCompany(id: string): Promise<Company | undefined> {
 }
 
 export async function getSignals(companyId: string): Promise<Signal[]> {
+  // Check if this is a demo company - always use mock data for demo
+  const company = await getCompany(companyId);
+  if (company?.fundId === "demo") {
+    return Promise.resolve(mock.getSignals(companyId));
+  }
+  
   if (!isSupabaseConfigured() || !supabase) {
     return Promise.resolve(mock.getSignals(companyId));
   }
@@ -264,7 +270,13 @@ export async function getSignals(companyId: string): Promise<Signal[]> {
       .eq("company_id", companyId)
       .order("timestamp", { ascending: false });
     if (error) throw error;
-    return ((data ?? []) as DbSignal[]).map(mapSignal);
+    const signals = ((data ?? []) as DbSignal[]).map(mapSignal);
+    // If no signals found and this might be a demo company, fall back to mock
+    if (signals.length === 0) {
+      const mockSignals = mock.getSignals(companyId);
+      if (mockSignals.length > 0) return mockSignals;
+    }
+    return signals;
   } catch (err) {
     logFallback("getSignals", err);
     return mock.getSignals(companyId);
@@ -346,8 +358,14 @@ export async function getOpenRolesForFund(fundId: string): Promise<(Role & { com
 }
 
 export async function getBrief(companyId: string, briefId?: string): Promise<CompanyBrief | undefined> {
+  // Check if this is a demo company - always use mock data for demo
+  const company = await getCompany(companyId);
+  if (company?.fundId === "demo") {
+    return Promise.resolve(mock.getBrief(companyId, briefId));
+  }
+  
   if (!isSupabaseConfigured() || !supabase) {
-    return Promise.resolve(mock.getBrief(companyId));
+    return Promise.resolve(mock.getBrief(companyId, briefId));
   }
   try {
     let query = supabase.from("company_briefs").select("*").eq("company_id", companyId);
@@ -362,19 +380,34 @@ export async function getBrief(companyId: string, briefId?: string): Promise<Com
     
     const { data, error } = await query.maybeSingle();
     if (error) {
-      if (error.code === "PGRST116") return undefined;
+      if (error.code === "PGRST116") {
+        // No brief found - check mock data for demo companies
+        return mock.getBrief(companyId, briefId);
+      }
       throw error;
     }
-    return data ? mapBrief(data as DbCompanyBrief) : undefined;
+    const brief = data ? mapBrief(data as DbCompanyBrief) : undefined;
+    // If no brief found and this might be a demo company, fall back to mock
+    if (!brief) {
+      const mockBrief = mock.getBrief(companyId, briefId);
+      if (mockBrief) return mockBrief;
+    }
+    return brief;
   } catch (err) {
     logFallback("getBrief", err);
-    return mock.getBrief(companyId);
+    return mock.getBrief(companyId, briefId);
   }
 }
 
 export async function getAllBriefs(companyId: string): Promise<CompanyBrief[]> {
+  // Check if this is a demo company - always use mock data for demo
+  const company = await getCompany(companyId);
+  if (company?.fundId === "demo") {
+    return Promise.resolve(mock.getAllBriefs(companyId));
+  }
+  
   if (!isSupabaseConfigured() || !supabase) {
-    return Promise.resolve([]);
+    return Promise.resolve(mock.getAllBriefs(companyId));
   }
   try {
     const { data, error } = await supabase
@@ -383,10 +416,16 @@ export async function getAllBriefs(companyId: string): Promise<CompanyBrief[]> {
       .eq("company_id", companyId)
       .order("created_at", { ascending: false });
     if (error) throw error;
-    return ((data ?? []) as DbCompanyBrief[]).map(mapBrief);
+    const briefs = ((data ?? []) as DbCompanyBrief[]).map(mapBrief);
+    // If no briefs found and this might be a demo company, fall back to mock
+    if (briefs.length === 0) {
+      const mockBriefs = mock.getAllBriefs(companyId);
+      if (mockBriefs.length > 0) return mockBriefs;
+    }
+    return briefs;
   } catch (err) {
     logFallback("getAllBriefs", err);
-    return [];
+    return mock.getAllBriefs(companyId);
   }
 }
 
@@ -736,8 +775,16 @@ export async function getSignalCache(companyId: string): Promise<SignalCache | n
  * Get all signal texts for a company (standard + custom)
  */
 export async function getSignalTexts(companyId: string | null): Promise<SignalText[]> {
+  // Check if this is a demo company - always use mock data for demo
+  if (companyId) {
+    const company = await getCompany(companyId);
+    if (company?.fundId === "demo") {
+      return Promise.resolve(mock.getSignalTexts(companyId));
+    }
+  }
+  
   if (!isSupabaseConfigured() || !supabase) {
-    return Promise.resolve([]);
+    return Promise.resolve(companyId ? mock.getSignalTexts(companyId) : mock.getStandardSignalTexts());
   }
   try {
     // Get standard signals (company_id is null) and custom signals for this company
@@ -769,10 +816,16 @@ export async function getSignalTexts(companyId: string | null): Promise<SignalTe
       }
     }
     
-    return allRows.map(mapSignalText);
+    const signalTexts = allRows.map(mapSignalText);
+    // If no signal texts found and this might be a demo company, fall back to mock
+    if (signalTexts.length === 0 && companyId) {
+      const mockSignalTexts = mock.getSignalTexts(companyId);
+      if (mockSignalTexts.length > 0) return mockSignalTexts;
+    }
+    return signalTexts;
   } catch (err) {
     logFallback("getSignalTexts", err);
-    return [];
+    return companyId ? mock.getSignalTexts(companyId) : mock.getStandardSignalTexts();
   }
 }
 

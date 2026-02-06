@@ -401,290 +401,293 @@ export default function CompanyDetailPage() {
     : signalCache?.lastChecked || company.lastUpdated;
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="font-serif text-4xl font-medium tracking-tight text-foreground">
-              {company.name}
-            </h1>
-            <Badge variant={healthVariant[company.health]} className="capitalize rounded-md">
-              {company.health}
-            </Badge>
-          </div>
-          <a
-            href={`https://${company.domain}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-base text-muted-foreground hover:text-accent-highlight inline-flex items-center gap-1 mt-2 transition-colors"
-          >
-            {company.domain}
-            <ExternalLink className="h-3 w-3" />
-          </a>
-          {/* Tracking summary */}
-          {signalTexts.length > 0 && (
-            <div className="flex items-center gap-2 mt-3">
-              <span className="text-sm text-muted-foreground">
-                {signalTexts.length} {signalTexts.length === 1 ? "signal" : "signals"} tracked*
-              </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsSignalsModalOpen(true)}
-                className="h-6 px-2 text-muted-foreground hover:text-foreground"
-              >
-                <Settings className="h-3 w-3" />
-              </Button>
-            </div>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-md relative overflow-hidden"
-              onClick={() => setIsCollectingSignals(true)}
-              disabled={isCollectingSignals}
-            >
-              {isCollectingSignals && (
-                <motion.div
-                  className="absolute inset-0 bg-accent-highlight/10"
-                  initial={{ x: "-100%" }}
-                  animate={{ x: "100%" }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                />
-              )}
-              <div className="inline-flex items-center">
-                {!isCollectingSignals && <Radio className="h-4 w-4 mr-2" />}
-                {isCollectingSignals ? (
-                  <Shimmer as="span" duration={2}>Checking...</Shimmer>
-                ) : (
-                  "Run alert"
-                )}
+    <div className="min-h-screen bg-background bg-pattern-arcs">
+      <div className="max-w-[95%] xl:max-w-[1400px] mx-auto py-6 px-6 lg:px-10">
+        <div className="space-y-8">
+          {/* Header */}
+          <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="font-serif text-4xl font-medium tracking-tight text-foreground">
+                  {company.name}
+                </h1>
+                <Badge variant={healthVariant[company.health]} className="capitalize rounded-md">
+                  {company.health}
+                </Badge>
               </div>
-            </Button>
-          </motion.div>
-        </div>
-      </header>
-
-      {/* Main Content - Actionable Summaries */}
-      <div className="space-y-6">
-          {/* Brief Navigation - Show history if multiple briefs exist */}
-          {allBriefs && allBriefs.length > 1 && brief && (
-            <BriefNavigation
-              briefs={allBriefs}
-              currentBriefId={selectedBriefId}
-              onSelectBrief={setSelectedBriefId}
-            />
-          )}
-
-          {/* 0. PARTNER TAKE - Decisive, opinionated */}
-          <AnimatePresence mode="wait">
-            {(isCollectingSignals || (isGeneratingBrief && !brief?.partnerTake)) ? (
-              <PartnerTakeSkeleton key="partner-take-skeleton" />
-            ) : brief?.partnerTake && revealedSections.partnerTake && !isCollectingSignals ? (
-              <motion.section
-                key="partner-take"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.4 }}
+              <a
+                href={`https://${company.domain}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-base text-muted-foreground hover:text-accent-highlight inline-flex items-center gap-1 mt-2 transition-colors"
               >
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold tracking-tight">Partner Take</h2>
-                  {brief.partnerTake && (
-                    <div className="flex items-center gap-2">
-                      <Badge
-                        variant={
-                          brief.partnerTake.action === "re-engage"
-                            ? "default"
-                            : brief.partnerTake.action === "monitor"
-                            ? "secondary"
-                            : "outline"
-                        }
-                        className="text-xs"
-                      >
-                        {brief.partnerTake.action === "re-engage" && "Re-engage"}
-                        {brief.partnerTake.action === "monitor" && "Monitor"}
-                        {brief.partnerTake.action === "ignore" && "Ignore"}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground">
-                        {(brief.partnerTake.confidence * 100)}% confidence
-                      </span>
-                    </div>
-                  )}
+                {company.domain}
+                <ExternalLink className="h-3 w-3" />
+              </a>
+              {/* Tracking summary */}
+              {signalTexts.length > 0 && (
+                <div className="flex items-center gap-2 mt-3">
+                  <span className="text-sm text-muted-foreground">
+                    {signalTexts.length} {signalTexts.length === 1 ? "signal" : "signals"} tracked*
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsSignalsModalOpen(true)}
+                    className="h-6 px-2 text-muted-foreground hover:text-foreground"
+                  >
+                    <Settings className="h-3 w-3" />
+                  </Button>
                 </div>
-                <Card>
-                  <CardContent className="p-4">
-                    <p className="text-sm text-foreground leading-relaxed mb-3">
-                      <TypewriterText
-                        text={brief.partnerTake.take}
-                        speed={6}
-                        delay={0}
-                        skipAnimation={!shouldAnimate}
-                        onComplete={shouldAnimate ? handlePartnerTakeComplete : undefined}
-                      />
-                    </p>
-                    {(brief.partnerTake.rationaleBullets?.length ?? 0) > 0 && (
-                      <ul className="space-y-1.5 pt-3 border-t border-border/40">
-                        {(brief.partnerTake.rationaleBullets ?? []).map((bullet, idx) => (
-                          <li key={idx} className="text-xs text-muted-foreground flex items-start gap-2">
-                            <span className="text-accent-highlight mt-0.5">•</span>
-                            <span>
-                              <TypewriterText
-                                text={bullet}
-                                speed={5}
-                                delay={idx * 20}
-                                skipThreshold={100}
-                                skipAnimation={!shouldAnimate}
-                              />
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-md relative overflow-hidden"
+                  onClick={() => setIsCollectingSignals(true)}
+                  disabled={isCollectingSignals}
+                >
+                  {isCollectingSignals && (
+                    <motion.div
+                      className="absolute inset-0 bg-accent-highlight/10"
+                      initial={{ x: "-100%" }}
+                      animate={{ x: "100%" }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                    />
+                  )}
+                  <div className="inline-flex items-center">
+                    {!isCollectingSignals && <Radio className="h-4 w-4 mr-2" />}
+                    {isCollectingSignals ? (
+                      <Shimmer as="span" duration={2}>Checking...</Shimmer>
+                    ) : (
+                      "Run alert"
                     )}
-                  </CardContent>
-                </Card>
-              </motion.section>
-            ) : null}
-          </AnimatePresence>
+                  </div>
+                </Button>
+              </motion.div>
+            </div>
+          </header>
 
-          {/* What Would Change My Mind + Momentum - below Partner Take */}
-          <AnimatePresence mode="wait">
-            {(isCollectingSignals || (isGeneratingBrief && !brief?.confidenceModifiers && brief?.momentumScore === undefined)) ? (
-              <div className="grid grid-cols-1 lg:grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6">
-                <KeyFactorsSkeleton />
-                <MomentumSkeleton />
-              </div>
-            ) : (brief?.confidenceModifiers || brief?.momentumScore !== undefined) && revealedSections.keyFactors && !isCollectingSignals ? (
-              <motion.div
-                key="key-factors-momentum"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.4 }}
-                className="grid grid-cols-1 lg:grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6"
-              >
-                {brief?.confidenceModifiers && (
-                  <section>
-                    <h2 className="text-xl font-semibold tracking-tight mb-4">Key Factors</h2>
-                    <Card>
-                      <CardContent className="p-4">
-                        <div className="space-y-2">
-                          <div className="flex items-start gap-2">
-                            <span className="text-green-500 mt-0.5 text-sm">↑</span>
-                            <p className="text-sm text-foreground leading-relaxed">
-                              <TypewriterText
-                                text={brief.confidenceModifiers.increases}
-                                speed={6}
-                                delay={0}
-                                skipThreshold={200}
-                                skipAnimation={!shouldAnimate}
-                              />
-                            </p>
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <span className="text-red-500 mt-0.5 text-sm">↓</span>
-                            <p className="text-sm text-foreground leading-relaxed">
-                              <TypewriterText
-                                text={brief.confidenceModifiers.decreases}
-                                speed={6}
-                                delay={80}
-                                skipThreshold={200}
-                                skipAnimation={!shouldAnimate}
-                              />
-                            </p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </section>
-                )}
-                {brief?.momentumScore !== undefined && (
-                  <section>
-                    <div className="flex items-center justify-between mb-4">
+          {/* Main Content - Actionable Summaries */}
+          <div className="space-y-6">
+            {/* Brief Navigation - Show history if multiple briefs exist */}
+            {allBriefs && allBriefs.length > 1 && brief && (
+              <BriefNavigation
+                briefs={allBriefs}
+                currentBriefId={selectedBriefId}
+                onSelectBrief={setSelectedBriefId}
+              />
+            )}
+
+            {/* 0. PARTNER TAKE - Decisive, opinionated */}
+            <AnimatePresence mode="wait">
+              {(isCollectingSignals || (isGeneratingBrief && !brief?.partnerTake)) ? (
+                <PartnerTakeSkeleton key="partner-take-skeleton" />
+              ) : brief?.partnerTake && revealedSections.partnerTake && !isCollectingSignals ? (
+                <motion.section
+                  key="partner-take"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-semibold tracking-tight">Partner Take</h2>
+                    {brief.partnerTake && (
                       <div className="flex items-center gap-2">
-                        <h2 className="text-xl font-semibold tracking-tight">Momentum</h2>
-                        <span
-                          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium bg-muted/60 text-muted-foreground border border-border/40 cursor-help"
-                          title="Experimental feature — not yet accurate."
+                        <Badge
+                          variant={
+                            brief.partnerTake.action === "re-engage"
+                              ? "default"
+                              : brief.partnerTake.action === "monitor"
+                              ? "secondary"
+                              : "outline"
+                          }
+                          className="text-xs"
                         >
-                          Alpha — not yet accurate
-                          <HelpCircle className="h-3.5 w-3.5" />
+                          {brief.partnerTake.action === "re-engage" && "Re-engage"}
+                          {brief.partnerTake.action === "monitor" && "Monitor"}
+                          {brief.partnerTake.action === "ignore" && "Ignore"}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {(brief.partnerTake.confidence * 100)}% confidence
                         </span>
                       </div>
-                      <Badge variant={brief.momentumStatus === "green" ? "default" : brief.momentumStatus === "yellow" ? "secondary" : "destructive"} className="capitalize">
-                        {brief.momentumStatus}
-                      </Badge>
-                    </div>
-                    <Card>
-                      <CardContent className="p-4">
-                        <div className="flex items-center gap-4">
-                          <div>
-                            <p className="text-2xl font-semibold text-foreground">{brief.momentumScore.toFixed(1)}</p>
-                            <p className="text-sm text-muted-foreground">Momentum Score</p>
+                    )}
+                  </div>
+                  <Card>
+                    <CardContent className="p-4">
+                      <p className="text-sm text-foreground leading-relaxed mb-3">
+                        <TypewriterText
+                          text={brief.partnerTake.take}
+                          speed={6}
+                          delay={0}
+                          skipAnimation={!shouldAnimate}
+                          onComplete={shouldAnimate ? handlePartnerTakeComplete : undefined}
+                        />
+                      </p>
+                      {(brief.partnerTake.rationaleBullets?.length ?? 0) > 0 && (
+                        <ul className="space-y-1.5 pt-3 border-t border-border/40">
+                          {(brief.partnerTake.rationaleBullets ?? []).map((bullet, idx) => (
+                            <li key={idx} className="text-xs text-muted-foreground flex items-start gap-2">
+                              <span className="text-accent-highlight mt-0.5">•</span>
+                              <span>
+                                <TypewriterText
+                                  text={bullet}
+                                  speed={5}
+                                  delay={idx * 20}
+                                  skipThreshold={100}
+                                  skipAnimation={!shouldAnimate}
+                                />
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </CardContent>
+                  </Card>
+                </motion.section>
+              ) : null}
+            </AnimatePresence>
+
+            {/* What Would Change My Mind + Momentum - below Partner Take */}
+            <AnimatePresence mode="wait">
+              {(isCollectingSignals || (isGeneratingBrief && !brief?.confidenceModifiers && brief?.momentumScore === undefined)) ? (
+                <div className="grid grid-cols-1 lg:grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6">
+                  <KeyFactorsSkeleton />
+                  <MomentumSkeleton />
+                </div>
+              ) : (brief?.confidenceModifiers || brief?.momentumScore !== undefined) && revealedSections.keyFactors && !isCollectingSignals ? (
+                <motion.div
+                  key="key-factors-momentum"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="grid grid-cols-1 lg:grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6"
+                >
+                  {brief?.confidenceModifiers && (
+                    <section>
+                      <h2 className="text-xl font-semibold tracking-tight mb-4">Key Factors</h2>
+                      <Card>
+                        <CardContent className="p-4">
+                          <div className="space-y-2">
+                            <div className="flex items-start gap-2">
+                              <span className="text-green-500 mt-0.5 text-sm">↑</span>
+                              <p className="text-sm text-foreground leading-relaxed">
+                                <TypewriterText
+                                  text={brief.confidenceModifiers.increases}
+                                  speed={6}
+                                  delay={0}
+                                  skipThreshold={200}
+                                  skipAnimation={!shouldAnimate}
+                                />
+                              </p>
+                            </div>
+                            <div className="flex items-start gap-2">
+                              <span className="text-red-500 mt-0.5 text-sm">↓</span>
+                              <p className="text-sm text-foreground leading-relaxed">
+                                <TypewriterText
+                                  text={brief.confidenceModifiers.decreases}
+                                  speed={6}
+                                  delay={80}
+                                  skipThreshold={200}
+                                  skipAnimation={!shouldAnimate}
+                                />
+                              </p>
+                            </div>
                           </div>
-                          <div className="flex-1">
-                            <p className="text-sm text-muted-foreground">
-                              <TypewriterText
-                                text={
-                                  brief.momentumScore >= 4
-                                    ? "Strong positive momentum - consider re-engaging"
-                                    : brief.momentumScore >= 1.5
-                                    ? "Moderate momentum - monitor closely"
-                                    : "Low momentum - may need attention"
-                                }
-                                speed={6}
-                                delay={150}
-                                skipThreshold={100}
-                                skipAnimation={!shouldAnimate}
-                              />
-                            </p>
-                          </div>
+                        </CardContent>
+                      </Card>
+                    </section>
+                  )}
+                  {brief?.momentumScore !== undefined && (
+                    <section>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <h2 className="text-xl font-semibold tracking-tight">Momentum</h2>
+                          <span
+                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium bg-muted/60 text-muted-foreground border border-border/40 cursor-help"
+                            title="Experimental feature — not yet accurate."
+                          >
+                            Alpha — not yet accurate
+                            <HelpCircle className="h-3.5 w-3.5" />
+                          </span>
                         </div>
-                      </CardContent>
-                    </Card>
-                  </section>
-                )}
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
+                        <Badge variant={brief.momentumStatus === "green" ? "default" : brief.momentumStatus === "yellow" ? "secondary" : "destructive"} className="capitalize">
+                          {brief.momentumStatus}
+                        </Badge>
+                      </div>
+                      <Card>
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-4">
+                            <div>
+                              <p className="text-2xl font-semibold text-foreground">{brief.momentumScore.toFixed(1)}</p>
+                              <p className="text-sm text-muted-foreground">Momentum Score</p>
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm text-muted-foreground">
+                                <TypewriterText
+                                  text={
+                                    brief.momentumScore >= 4
+                                      ? "Strong positive momentum - consider re-engaging"
+                                      : brief.momentumScore >= 1.5
+                                      ? "Moderate momentum - monitor closely"
+                                      : "Low momentum - may need attention"
+                                  }
+                                  speed={6}
+                                  delay={150}
+                                  skipThreshold={100}
+                                  skipAnimation={!shouldAnimate}
+                                />
+                              </p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </section>
+                  )}
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
 
-          {briefError && (
-            <div className="rounded-md border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-800 dark:text-amber-200">
-              {briefError}
-            </div>
-          )}
+            {briefError && (
+              <div className="rounded-md border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-800 dark:text-amber-200">
+                {briefError}
+              </div>
+            )}
 
-          {/* Unified Insights - Combines signal collection and insights display */}
-          {company && (
-            <UnifiedInsights
-              companyId={company.id}
-              companyName={company.name}
-              signals={signals}
-              brief={brief}
-              isCollectingSignals={isCollectingSignals}
-              isGeneratingBrief={isGeneratingBrief}
-              onSignalCollectionComplete={handleSignalCollectionComplete}
-              onSignalsFound={handleSignalsFound}
-              newlyGeneratedBriefId={waitingForBriefIdRef.current}
+            {/* Unified Insights - Combines signal collection and insights display */}
+            {company && (
+              <UnifiedInsights
+                companyId={company.id}
+                companyName={company.name}
+                signals={signals}
+                brief={brief}
+                isCollectingSignals={isCollectingSignals}
+                isGeneratingBrief={isGeneratingBrief}
+                onSignalCollectionComplete={handleSignalCollectionComplete}
+                onSignalsFound={handleSignalsFound}
+                newlyGeneratedBriefId={waitingForBriefIdRef.current}
+              />
+            )}
+          </div>
+
+          {/* Signals Modal */}
+          {company && id && (
+            <SignalsModal
+              companyId={id}
+              signals={signalTexts}
+              open={isSignalsModalOpen}
+              onClose={() => setIsSignalsModalOpen(false)}
+              onUpdate={refetchSignalTexts}
             />
           )}
-
+        </div>
       </div>
-
-      {/* Signals Modal */}
-      {company && id && (
-        <SignalsModal
-          companyId={id}
-          signals={signalTexts}
-          open={isSignalsModalOpen}
-          onClose={() => setIsSignalsModalOpen(false)}
-          onUpdate={refetchSignalTexts}
-        />
-      )}
     </div>
   );
 }

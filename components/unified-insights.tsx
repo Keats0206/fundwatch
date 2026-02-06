@@ -321,9 +321,17 @@ export function UnifiedInsights({
     });
 
     es.addEventListener("error", (e: MessageEvent) => {
-      const data = JSON.parse(e.data) as Extract<EventData, { type: "error" }>;
-      console.error("[FundWatch UnifiedInsights] SSE event error:", data.error);
-      addLog("error", `Error: ${data.error}`);
+      let errorMessage = "Connection error";
+      if (e.data) {
+        try {
+          const data = JSON.parse(e.data) as Extract<EventData, { type: "error" }>;
+          errorMessage = data.error || errorMessage;
+        } catch (parseError) {
+          console.error("[FundWatch UnifiedInsights] Failed to parse error data:", e.data);
+        }
+      }
+      console.error("[FundWatch UnifiedInsights] SSE event error:", errorMessage);
+      addLog("error", `Error: ${errorMessage}`);
       setIsCollectionComplete(true);
       setCurrentStatus("AI service temporarily unavailable — try again later.");
       es.close();

@@ -82,6 +82,21 @@ export async function POST(
     console.error("[FundWatch generate-brief] Abort: Company not found:", id);
     return NextResponse.json({ error: "Company not found" }, { status: 404 });
   }
+  
+  // Allow demo companies without auth check
+  const isDemo = company.fundId === "demo";
+  if (!isDemo) {
+    // For non-demo companies, check auth
+    const { getCookieName, validateFundId } = await import("@/lib/auth");
+    const cookieName = getCookieName();
+    const cookie = request.cookies.get(cookieName);
+    const fundId = cookie?.value ?? null;
+    const isValid = fundId ? validateFundId(fundId) : false;
+    
+    if (!fundId || !isValid) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+  }
 
   // Create streaming response
   const stream = new ReadableStream({
